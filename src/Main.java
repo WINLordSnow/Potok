@@ -2,6 +2,23 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+enum lists {
+    x(2)/*, m(7), s(21)*/;
+    private int mod;
+
+    lists(int l) {
+        mod = l;
+    }
+
+    int getMod() {
+        return mod;
+    }
+
+    static int getSize() {
+        return lists.values().length;
+    }
+}
+
 class arrTest {
     private int arrLength;
     private final int mod;
@@ -71,17 +88,17 @@ class arrTest {
             i.arrClear();
     }
 
-    static boolean arrAnyMore(int[] arrTemp, int[] arrModTemp) {
+    static boolean arrAnyMore(int[] arrTemp) {
         int[] arrTemp1;
         arrTemp1 = arrTemp;
         for (int i = 0; i < arrTemp1.length; i++)
-            for (int j : arrModTemp) {
-                if ((arrTemp1[i]%j) == 0)
-                    arrTemp1[i] = arrModTemp[0];
+            for (lists j : lists.values()) {
+                if ((arrTemp1[i]%j.getMod()) == 0)
+                    arrTemp1[i] = j.values()[0].getMod();
             }
         int k = 0;
         for (int i = 0; i < arrTemp1.length; i++)
-            if (arrTemp1[i] == arrModTemp[0])
+            if (arrTemp1[i] == lists.values()[0].getMod())
                 k++;
         return !(k == arrTemp1.length);
     }
@@ -132,15 +149,25 @@ public class Main {
         String choice;
         boolean initBool;
 
-        String[] listName = new String[] {"x", "m", "s"};
-        int[] listMod = {3, 7, 21};
-        int[] massiv = {5, 3, 8, 12, 6, 22, 140, 9, 333};
+        lists listmod;
+        int[] massiv = {9, 3, 8,5,34,7,8,132,6};
+        arrTest[] listArr = new arrTest[lists.getSize()];
 
-        arrTest[] listArr = new arrTest[listMod.length];
+        for (lists p :lists.values()) {
+            listArr[p.ordinal()] = new arrTest(p.name(), p.getMod());
+            listArr[p.ordinal()].arrSet(massiv);
+        }
+
+        //String[] listName = {"x", "m", "s"};
+        //int[] listMod = {3, 7, 21};
+
+
+
+        /*arrTest[] listArr = new arrTest[listMod.length];
         for (int i = 0; i < listMod.length; i++) {
             listArr[i] = new arrTest(listName[i], listMod[i]);
             listArr[i].arrSet(massiv);
-        }
+        }*/
         do {
             choice = br.readLine().toLowerCase();
             initBool = false;
@@ -153,7 +180,7 @@ public class Main {
                     } catch (NumberFormatException e) {
                         System.out.println("Массив должен состоять из целых чисел. Набери help!!!");
                     }
-                    for (int i = 0; i < listMod.length; i++)
+                    for (int i = 0; i < lists.getSize(); i++)
                         listArr[i].arrSet(massiv);
                 }
             }
@@ -166,14 +193,15 @@ public class Main {
                 case "print s":
                 case "print m":
                     try {
-                        int index = Arrays.asList(listName).indexOf(choice.substring(choice.length() - 1));
-                        listArr[index].arrPrint();
-                    } catch (ArrayIndexOutOfBoundsException e) {
+                        lists p = lists.valueOf(
+                                choice.substring(choice.length() - 1));
+                        listArr[p.ordinal()].arrPrint();
+                    } catch (IllegalArgumentException e) {
                         System.out.println("Набери help");
                     }
                     break;
                 case "anymore":
-                    System.out.println(arrTest.arrAnyMore(massiv, listMod));
+                    System.out.println(arrTest.arrAnyMore(massiv));
                     break;
                 case "clear":
                     arrTest.arrClearAll(listArr);
@@ -181,9 +209,13 @@ public class Main {
                 case "clear x":
                 case "clear s":
                 case "clear m":
-                    int index = Arrays.asList(listName).indexOf(
-                            choice.substring(choice.length() - 1).toLowerCase());
-                    listArr[index].arrClear();
+                    try {
+                        lists p;
+                        p = lists.valueOf(choice.substring(choice.length() - 1).toLowerCase());
+                        listArr[p.ordinal()].arrClear();
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Набери help");
+                    }
                     break;
                 case "merge":
                     arrTest arrMerge = new arrTest("Merge", 1);
